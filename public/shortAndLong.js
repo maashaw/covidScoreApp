@@ -38,7 +38,7 @@ let scoreType = 0; //0- short score, 1- long score, 2- isaric
 let scoreSelectMSOL = {
     rowId:"testSelection", rowDom:undefined, value:0,
     titleLabel:"Select Test", titleLabelShort:"Test", titleLabelThreshold:300, titleWidth:30, titleDom:undefined, 
-    buttonLabels:["Short Score", "Long Score", "Isaric Score"], buttonLabelsShort:["Short", "Long", "Isaric"], buttonLabelsThreshold:420,
+    buttonLabels:["Short Score", "Long Score", "Isaric Score"], buttonLabelsShort:["Short", "Long", "Isaric"], buttonLabelsThreshold:430,
     buttonIds:["shortScore", "longScore", "isaricScore"], 
     buttonDoms:[], buttonHandlers:[onSetShortScore, onSetLongScore, onSetIsaricScore]};
 let satsMSOL = {
@@ -48,7 +48,7 @@ let satsMSOL = {
 let ageRangeMSOL = { //0- >50. 1- 50-59. 2- 60-69. 3- 70-79. 4- >=80. Not neccessarily a score.
     rowId:"ageRange", rowDom:undefined, value:0, 
     titleLabel:"Age", titleWidth:30, titleDom:undefined, 
-    buttonLabels:["<50", "50-59", "60-69", "70-79", ">80"], buttonLabelsShort:["<50", "50s", "60s", "70s", ">80"], buttonLabelsThreshold:350,
+    buttonLabels:["<50", "50-59", "60-69", "70-79", ">80"], buttonLabelsShort:["<50", "50s", "60s", "70s", ">80"], buttonLabelsThreshold:370,
     buttonIds:["ageless50", "age50-59", "age60-69", "age70-79", "agemore80"], 
     buttonDoms:[], buttonHandlers:[onAgeUnder50check, onAgeBetween5059check, onAgeBetween6069check, onAgeBetween7079check, onAgeOver80check]};
 let obesityMSOL = {
@@ -83,7 +83,7 @@ let leucophiliaMSOL = {
     buttonDoms:[], buttonHandlers:[onLeucophiliaUncheck, onLeucophiliaCheck]};
 let lymphopeniaMSOL = {
     rowId:"lymphopenia", rowDom:undefined, value:0, 
-    titleLabel:"Lymphopenia (Lymphocytes <0.7)", titleLabelShort:"Lymph <0.7", titleLabelThreshold:400, titleWidth:65, titleDom:undefined, 
+    titleLabel:"Lymphopenia (Lymphocytes <0.7)", titleLabelShort:"Lymph <0.7", titleLabelThreshold:410, titleWidth:65, titleDom:undefined, 
     buttonLabels:["No", "Yes"], buttonIds:["noLymphopenia", "yesLymphopenia"], 
     buttonDoms:[], buttonHandlers:[onLymphopeniaUncheck, onLymphopeniaCheck]};
 let cxrChangesMSOL = {
@@ -93,7 +93,7 @@ let cxrChangesMSOL = {
     buttonDoms:[], buttonHandlers:[onCxrChangesUncheck, onCxrChangesCheck]};
 let ckdStageRangeMSOL = { //0- CKD1. 1- CKD2. 2- CKD3. 3- CKD4. 4- CKD5. Not neccessarily a score.
     rowId:"ckdStageRange", rowDom:undefined, value:0, 
-    titleLabel:"Renal Function", titleLabelShort:"CKD", titleLabelThreshold:380, titleWidth:30, titleDom:undefined, 
+    titleLabel:"Renal Function", titleLabelShort:"CKD", titleLabelThreshold:400, titleWidth:30, titleDom:undefined, 
     buttonLabels:["CKD 1", "CKD 2", "CKD 3", "CKD 4", "CKD 5"], buttonLabelsShort:["1", "2", "3", "4", "5"], buttonLabelsThreshold:420,
     buttonIds:["ckd1", "ckd2", "ckd3", "ckd4", "ckd5"], 
     buttonDoms:[], buttonHandlers:[onCkd1Check, onCkd2Check, onCkd3Check, onCkd4Check, onCkd5Check]};

@@ -1,7 +1,7 @@
-
 nohup.out
 data.csv
 .DS_Store
-node_modules/
 .env
-
+node_modules
+build
+npm-debug.log
