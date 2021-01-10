@@ -651,7 +651,7 @@ function onNhsNumberChange()
 
 function onSubmitButtonPress()
 {
-    postData("http://15.161.6.195:3000/sendData", {
+    postData(document.location.protocol + "//" + document.location.hostname + ":3000/sendData", {
         nhsData:     demographicNhsNumber,
         nameData:    demographicFName, 
         surnameData: demographicLName, 

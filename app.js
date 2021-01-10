@@ -73,42 +73,42 @@ score INT
 
 INSERT INTO covidScore (dateadded, nhsnumber, fname, lname)
 VALUES (null, 4195315, "Paul", "Logan");
-      */ 
-    app.post('/newScore', function(req, res) {
-    let sql = `INSERT INTO ${process.env.DB_TABLE}(dateadded, nhsnumber, fname, lfname,
-    sex, dob, age, resp, spo, stroke, obesity, everSmoker, dementia,
-    leucophilia, lymphopenia, cxrChanges, gcs, comorbidRange, tachypneoaRange,
-    ureaRange, crpRange) VALUES (?)`;
-    let values = [
-      req.body.dateadded,
-      req.body.nhsnumber,
-      req.body.fname,
-      req.body.lfname,
-      req.body.sex,
-      req.body.dob,
-      req.body.age,
-      req.body.resp,
-      req.body.spo,
-      req.body.stroke,
-      req.body.obesity,
-      req.body.everSmoker,
-      req.body.dementia,
-      req.body.leucophilia,
-      req.body.lymphopenia,
-      req.body.cxrChanges,
-      req.body.gcs,
-      req.body.comorbidRange,
-      req.body.tachypneoaRange,
-      req.body.ureaRange,
-      req.body.crpRange,
-    ];
-    connection.query(sql, [values], function(err, data, fields) {
-        if (err) throw err;
-        res.json({
-        status: 200,
-        message: "New data added successfully"
-      })
+*/ 
+
+
+app.post('/newScore', function(req, res) {
+  let sql = `INSERT INTO ${process.env.DB_TABLE}(dateadded, nhsnumber, fname, lfname,
+          sex, dob, age, resp, spo, stroke, obesity, everSmoker, dementia,
+          leucophilia, lymphopenia, cxrChanges, gcs, comorbidRange, tachypneoaRange,
+          ureaRange, crpRange) VALUES (?)`;
+  let values = [req.body.dateadded,
+                req.body.nhsnumber,
+                req.body.fname,
+                req.body.lfname,
+                req.body.sex,
+                req.body.dob,
+                req.body.age,
+                req.body.resp,
+                req.body.spo,
+                req.body.stroke,
+                req.body.obesity,
+                req.body.everSmoker,
+                req.body.dementia,
+                req.body.leucophilia,
+                req.body.lymphopenia,
+                req.body.cxrChanges,
+                req.body.gcs,
+                req.body.comorbidRange,
+                req.body.tachypneoaRange,
+                req.body.ureaRange,
+                req.body.crpRange ];
+  connection.query(sql, [values], function(err, data, fields) {
+    if (err) throw err;
+    res.json({
+      status: 200,
+      message: "New data added successfully"
     })
+  })
 });
 
 
