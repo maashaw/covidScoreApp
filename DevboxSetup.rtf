@@ -1,0 +1,241 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2577
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Bold;\f1\fnil\fcharset0 HelveticaNeue;\f2\fnil\fcharset0 HelveticaNeue-Italic;
+}
+{\colortbl;\red255\green255\blue255;\red220\green161\blue13;}
+{\*\expandedcolortbl;;\cssrgb\c89412\c68627\c3922;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww33400\viewh20440\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\b\fs26 \cf0 Burn an SD Card\
+
+\f1\b0 Download the ubuntu 20.04 LTS 64-bit image and burn it onto an SD card with BalenaEtcher\
+\
+
+\f0\b Set up Ubuntu for headless SSH\
+
+\f1\b0 Re-mount the SD Card and open up the terminal on your Linux/Mac\
+$ touch /Volumes/system-boot/ssh\
+Or otherwise, create a file \'92ssh\'92 on the system-boot volume on the newly burnt SD Card\
+(You\'92ve got to do this before the first boot, or it won\'92t work)\
+Eject the SD Card\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\b \cf0 Boot up Ubuntu\
+
+\f1\b0 Put the SD Card into the Raspberry Pi, plug in an Ethernet Cable, and finally plug in the USB power \
+\
+
+\f0\b Connect over SSH\
+
+\f1\b0 Now find the IP address for your Raspberry Pi\
+$ arp -na\
+Look for the new device; the MAC might start b8:27:eb if you\'92re on Ethernet. The IP address briefly scrolls past during startup, but you might have to check your router\'92s device list\
+$ ssh ubuntu@[IP address]\
+Accept the ECDSA key, and log in to the Pi\
+the default password is ubuntu - you\'92ll be prompted immediately to change it. Once you\'92ve done that, you\'92ll be disconnected. \
+$ ssh ubuntu@[IP address]\
+\
+
+\f0\b Set up the Raspberry Pi
+\f1\b0 \
+$ sudo apt update\
+$ sudo apt upgrade\
+\
+
+\f0\b Set up mDNS (so you can set your pi up as navteam.local)\
+
+\f1\b0 $ sudo apt install avahi-deamon\
+$ sudo nano /etc/default/avahi-daemon\
+Scroll down to the [server] section\
+Change the following lines:\
+	#host-name=foo to host-name=navteam\
+	#domain-name=local to domain-name=local\
+Save (Ctrl-O) and Quit (Ctrl-X)\
+$ sudo systemctl restart avahi-daemon\
+Now's a good time to reboot the PI\
+$ sudo reboot\
+Now you can log back in using\
+$ ssh {\field{\*\fldinst{HYPERLINK "mailto:ubuntu@navteam.local"}}{\fldrslt \cf2 ubuntu@navteam.local}}\
+(You\'92ll have to re-accept the ECDSA key, now the host name has changed)\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\b \cf0 Set up passwordless SSH access\
+
+\f1\b0 On your Mac/linux desktop:\
+$ ssh-keygen -t rsa\
+Follow the prompts, pick a name for the key (e.g. navteam-devbox), and a password\
+$ ssh-copy-id -i ~/navteam_devbox.pub  {\field{\*\fldinst{HYPERLINK "mailto:ubuntu@navteam.local"}}{\fldrslt \cf2 ubuntu@navteam.local}}\
+Now we need to add the key to our SSH client:\
+$ eval "$(ssh-agent -s)"\
+$ open ~/.ssh/config\
+If you see \'93The file \'85 does not exist\'94, then run:\
+	$ touch ~/.ssh/config\
+$ nano ~/.ssh/config\
+Add the following lines:\
+host navteam.local\
+	HostName navteam.local\
+	user ubuntu\
+	AddKeysToAgent yes\
+	UseKeychain yes\
+	IdentityFile ~/navteam-devbox\
+$ ssh-add -K $HOME/navteam-devbox\
+You should now be able to connect to the devbox with\
+$ ssh navteam.local\
+Without being prompted for a password.\
+\
+
+\f0\b Install Node.js
+\f1\b0 \
+This will install the version of Node present in the ubuntu default repo. This is not the most recent edition, which can be installed from the node repo with a few extra steps\
+The ubuntu default repo has node v10.x, which is now maintainance LTS and will be EoL in April 2021\
+We need to add a repo for node v14.x, which is in active LTS and will be supported until April 2023\
+$ curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -\
+$ sudo apt install -y nodejs\
+$ sudo apt install -y build-essential\
+$ node -v\
+This last command will show the installed node version, e.g. v14.15.4\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\b \cf0 Install nginx\
+
+\f1\b0 $ sudo apt install -y nginx\
+$ sudo systemctl start nginx\
+$ sudo systemctl enable nginx\
+You should now be able to navigate to navteam.local and see the nginx \'91Welcome\'92 page\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\b \cf0 Install Git\
+
+\f1\b0 $ sudo apt install -y git\
+\
+
+\f0\b Set up nginx\
+
+\f1\b0 $ sudo nano /etc/nginx/sites-available/navteam.local\
+Enter the following configuration:\
+server \{\
+        listen 80;\
+        listen [::]:80;\
+        server_name navteam.local;\
+        root /var/www/navteam.local/covidScoreApp/public;\
+        index index.html;\
+\}\
+$ sudo nginx -t\
+$ sudo systemctl restart nginx\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\b \cf0 Load the website content from GitHub\
+
+\f1\b0 $ mkdir -P /var/www/navteam.local
+\f0\b \
+
+\f1\b0 $ cd /var/www/navteam.local\
+$ git clone {\field{\*\fldinst{HYPERLINK "https://github.com/maashaw/covidScoreApp.git"}}{\fldrslt \cf2 https://github.com/maashaw/covidScoreApp.git}}\
+Ensure permissions are set correctly\
+$ sudo chown -R $USER:$USER /var/www/navteam.local\
+$ chmod -R 755 /var/www/navteam.local\
+\
+
+\f0\b Install Node dependencies\
+
+\f1\b0 $ cd ./covidScoreApp\
+$ sudo npm install\
+\
+
+\f0\b Set up MySQL\
+
+\f1\b0 $ sudo apt install mysql-server\
+$ sudo mysql_secure_installation\
+Set a password for MySQL access, and accept the suggested defaults\
+$ sudo mysql\
+$mysql> CREATE USER \'91
+\f2\i [select a user name]
+\f1\i0 \'92@localhost IDENTIFIED WITH mysql_native_password BY \'91
+\f2\i [Enter a password here]
+\f1\i0 \'92;\
+$mysql>  GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO \'92
+\f2\i [username from above]
+\f1\i0 \'92@localhost WITH GRANT OPTION;\
+$mysql>  FLUSH PRIVILEGES;\
+$mysql>  CREATE DATABASE covidScoreApp;\
+$mysql>  USE covidScoreApp\
+$mysql> CREATE TABLE covidScore(\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 id INT AUTO_INCREMENT PRIMARY KEY,\
+dateadded DATETIME,\
+nhsnumber VARCHAR(15),\
+fname VARCHAR(50),\
+lname VARCHAR(50),\
+sex VARCHAR(15),\
+dob DATETIME,\
+age INT,\
+resp INT,\
+spo INT,\
+stroke INT,\
+obesity INT,\
+everSmoker INT,\
+dementia INT,\
+leucophilia INT,\
+lymphopenia INT,\
+cxrChanges INT,\
+gcs INT,\
+comorbidRange INT,\
+tachypneoaRange INT,\
+ureaRange INT,\
+crpRange INT,\
+score INT\
+);\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 $mysql> exit\
+Now edit the example.env file with the credentials for the MySQL Database\
+$ nano ./example.env\
+Modify the defaults to include the correct environment params:\
+DB_HOST=localhost
+\f2\i \
+
+\f1\i0 DB_USER=
+\f2\i [username from above]
+\f1\i0 \
+DB_PASS=
+\f2\i [password from above]\
+
+\f1\i0 DATABASE=covidScoreApp\
+DB_TABLE=covidScore
+\f2\i \
+
+\f1\i0 Now re-name example.env to .env\
+$ mv example.env .env\
+To avoid accidentally leaking the database credentials, .env should \ul not\ulnone  be included in the git repo, and \ul should\ulnone  be included in the git .ignore file.\
+\
+
+\f0\b Set up nodeamon to simplify working on the server code\
+
+\f1\b0 $ sudo npm install -g nodemon\
+Now run the node server\
+$ nodemon ./app.js\
+\
+Now try to access the website at navteam.local.\
+\
+To restart node manually while nodemon is running, type \'91rs\'92.\
+However, it should automatically restart whenever you make changes to app.js.\
+\
+If you update the repo, these changes can be propagated to the devbox using:\
+$ cd /var/www/navteam.local\
+$ git pull {\field{\*\fldinst{HYPERLINK "https://github.com/maashaw/covidScoreApp.git"}}{\fldrslt \cf2 https://github.com/maashaw/covidScoreApp.git}}\
+\
+Alternatively, you may wish to run node in a screen session, which you can then detach from, allowing you to do other work in the same SSH session.\
+$ screen\
+$ nodemon app.js\
+$ [ctrl-d]\
+}
